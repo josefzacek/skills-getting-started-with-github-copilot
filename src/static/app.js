@@ -24,30 +24,60 @@ document.addEventListener("DOMContentLoaded", () => {
         const spotsLeft = details.max_participants - details.participants.length;
 
         // Generate participants list HTML
-        const participantsList = details.participants.length > 0
-          ? `<div class="participants-section">
-               <h5>Current Participants:</h5>
-               <ul class="participants-list">
-                 ${details.participants.map(email => `
-                   <li>
-                     <span class="participant-email">${email}</span>
-                     <button class="delete-icon" onclick="unregisterParticipant('${name}', '${email}')" title="Remove participant">×</button>
-                   </li>
-                 `).join('')}
-               </ul>
-             </div>`
-          : `<div class="participants-section">
-               <h5>Current Participants:</h5>
-               <p class="no-participants">No participants yet - be the first to sign up!</p>
-             </div>`;
+        let participantsSection;
+        if (details.participants.length > 0) {
+          participantsSection = document.createElement("div");
+          participantsSection.className = "participants-section";
+
+          const h5 = document.createElement("h5");
+          h5.textContent = "Current Participants:";
+          participantsSection.appendChild(h5);
+
+          const ul = document.createElement("ul");
+          ul.className = "participants-list";
+
+          details.participants.forEach(email => {
+            const li = document.createElement("li");
+
+            const span = document.createElement("span");
+            span.className = "participant-email";
+            span.textContent = email;
+            li.appendChild(span);
+
+            const button = document.createElement("button");
+            button.className = "delete-icon";
+            button.title = "Remove participant";
+            button.textContent = "×";
+            button.addEventListener("click", () => {
+              unregisterParticipant(name, email);
+            });
+            li.appendChild(button);
+
+            ul.appendChild(li);
+          });
+
+          participantsSection.appendChild(ul);
+        } else {
+          participantsSection = document.createElement("div");
+          participantsSection.className = "participants-section";
+
+          const h5 = document.createElement("h5");
+          h5.textContent = "Current Participants:";
+          participantsSection.appendChild(h5);
+
+          const p = document.createElement("p");
+          p.className = "no-participants";
+          p.textContent = "No participants yet - be the first to sign up!";
+          participantsSection.appendChild(p);
+        }
 
         activityCard.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
-          ${participantsList}
         `;
+        activityCard.appendChild(participantsSection);
 
         activitiesList.appendChild(activityCard);
 
